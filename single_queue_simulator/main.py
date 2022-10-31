@@ -1,5 +1,9 @@
 #Elias Matos e Morgana Weber
 
+import sys
+
+sys.setrecursionlimit(1500)
+
 def random_generator(x0, a, c, M, size):
     values = [0] * size
     values[0] = x0
@@ -13,18 +17,20 @@ def random_generator(x0, a, c, M, size):
 RANDOM_NUMBERS_AMOUNT = 1000
 QUEUE = [] 
 SCHEDULER = []
+PROB = []
 TIME = 1
 RANDOM_NUMBERS = random_generator(1, 1.3, 0.2, 1, RANDOM_NUMBERS_AMOUNT)
 #RANDOM_NUMBERS = [0.2,0.7,0.1,0.9,0.3,0.4,0.6,0.5]
-START_ARRIVE = 1
-END_ARRIVE = 2
+START_ARRIVE = 2
+END_ARRIVE = 4
 START_EXIT = 3
-END_EXIT = 4
+END_EXIT = 5
 
 def single_queue_simulator(c, k):
     global SCHEDULER
     global TIME
     QUEUE.append([TIME,0])
+    PROB.append(TIME)
     individual_time = (END_EXIT-START_EXIT) * RANDOM_NUMBERS.pop(0) +  START_EXIT
     SCHEDULER.append([TIME+individual_time, individual_time, 1]) 
     #print("tabela 1: ", QUEUE)
@@ -40,8 +46,12 @@ def arrival(k,c):
     global QUEUE
     global START_ARRIVE
     global END_ARRIVE
+    global PROB
     
-    if len(RANDOM_NUMBERS) == 0: exit()
+    if len(RANDOM_NUMBERS) == 0:        
+        for j in range(len(PROB)):
+            print("Estado da fila: ", j, " tempo: ", PROB[j], " probabilidade: ", PROB[j]/TIME)     
+        exit()
 
     individual_time = (END_ARRIVE-START_ARRIVE) * RANDOM_NUMBERS.pop(0) +  START_ARRIVE
     TIME += individual_time
@@ -53,6 +63,7 @@ def arrival(k,c):
     #print("tabela 2: ", SCHEDULER)
     
     if len(QUEUE) < k:
+        PROB.append(individual_time)
         QUEUE.append(SCHEDULER.pop(0))
         if len(QUEUE) <= c:
             exit_queue(c)
@@ -77,4 +88,4 @@ def exit_queue(c):
     individual_time = (END_EXIT-START_EXIT) * RANDOM_NUMBERS.pop(0) +  START_EXIT
     SCHEDULER.append([TIME, individual_time, 1])
 
-single_queue_simulator(2, 4)
+single_queue_simulator(2, 5)
